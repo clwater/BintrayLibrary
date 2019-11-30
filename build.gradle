@@ -6,6 +6,7 @@ buildscript {
         google()
         jcenter()
         maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
+        maven { url 'https://dl.bintray.com/clwater-test/ClwaterRepository'}
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.0.0-alpha04'
