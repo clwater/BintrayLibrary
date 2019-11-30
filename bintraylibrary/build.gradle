@@ -32,23 +32,39 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }
 
-/** 以下开始是将Android Library上传到jcenter的相关配置**/
 
+// 以下内容是将Library上传到Bintray的相关配置
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
+
+//以下是需要针对项目需要修改的配置内容
+//发布者的组织名称
+group = "com.clwater"
+// 版本号，下次更新是只需要更改版本号即可
+version = "0.0.1"
+//上面配置后上传至bintray后的编译路径是这样的： compile 'com.clwater:bintraylibrary:0.0.1'
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+//读取 local.properties 文件里面的 bintray.user
+def bintrayUser = properties.getProperty("bintray.user")
+//读取 local.properties 文件里面的 bintray.apikey
+def bintrayKey = properties.getProperty("bintray.apikey")
 
 //项目主页
 def siteUrl = 'https://github.com/clwater/BintrayLibrary'
 //项目的版本控制地址
 def gitUrl = 'https://github.com/clwater/BintrayLibrary.git'
-
-//发布到组织名称名字，必须填写
-group = "com.clwater.bintraylibrary"
 //发布到JCenter上的项目名字，必须填写
 def libName = "testlibrary"
-// 版本号，下次更新是只需要更改版本号即可
-version = "0.0.1"
-/**  上面配置后上传至jcenter后的编译路径是这样的： compile 'com.clwater.bintraylibrary:testlibrary:0.0.1'  **/
+//文档连接
+def javaDocLinks = "https://github.com/clwater"
+//Bintray中Repository的名字
+def bintrayRepo = "ClwaterRepository"
+//应用的描述
+def bintrayDesc = "Desc"
+//组织的名字, 建立组织账号后上传的时候需要这个, 个人张海时候不需要修改这部分
+def bintrayUserOrg = "ClwaterRepository"
 
 //生成源文件
 task sourcesJar(type: Jar) {
@@ -59,11 +75,12 @@ task sourcesJar(type: Jar) {
 task javadoc(type: Javadoc) {
     source = android.sourceSets.main.java.srcDirs
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    //以下两个为项目中带有中文注释的支持
     options.encoding "UTF-8"
     options.charSet 'UTF-8'
     options.author true
     options.version true
-    options.links "https://github.com/linglongxin24/FastDev/tree/master/mylibrary/docs/javadoc"
+    options.links javaDocLinks
     failOnError false
 }
 
@@ -91,19 +108,23 @@ install {
         pom {
             project {
                 packaging 'aar'
-                name 'namename'
+                //项目名称和描述
+                name 'pom project name'
+                description 'pom project escription'
                 url siteUrl
                 licenses {
                     license {
-                        name 'This is a lightweight SQLite database framework'
-                        url 'https://github.com/linglongxin24/SQLite'
+                        //开源协议,在bintray中创建仓库时选择的license为Apache-2.0，复制下面的就可以
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                     }
                 }
                 developers {
+                    //开发者的个人信息
                     developer {
-                        id 'clwater'
-                        name 'clwater'
-                        email 'gengzhibo@gengzhibo.net'
+                        id 'developer id '
+                        name 'developer name '
+                        email 'developer email'
                     }
                 }
                 scm {
@@ -117,17 +138,15 @@ install {
 }
 
 //上传到jcenter
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
 bintray {
-    user = properties.getProperty("bintray.user")    //读取 local.properties 文件里面的 bintray.user
-    key = properties.getProperty("bintray.apikey")   //读取 local.properties 文件里面的 bintray.apikey
+    user = bintrayUser
+    key = bintrayKey
     configurations = ['archives']
     pkg {
-//        userOrg = 'clwater-vhop'
-        repo = "maven"
-        name = libName    //发布到JCenter上的项目名字，必须填写
-        desc = 'desc'    //项目描述
+//        userOrg = bintrayUserOrg
+        repo = bintrayRepo
+        name = libName
+        desc =  bintrayDesc
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         licenses = ["Apache-2.0"]
